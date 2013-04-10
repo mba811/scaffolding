@@ -21,7 +21,7 @@ using namespace std;
 #define S44 21
 
 
-/* F, G, H and I are basic MD5 functions.
+/* F, G, H and I are basic CMD5 functions.
 */
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
 #define G(x, y, z) (((x) & (z)) | ((y) & (~z)))
@@ -57,8 +57,8 @@ Rotation is separate from addition to prevent recomputation.
 }
 
 
-const byte MD5::PADDING[64] = { 0x80 };
-const char MD5::HEX[16] = {
+const byte CMD5::PADDING[64] = { 0x80 };
+const char CMD5::HEX[16] = {
 	'0', '1', '2', '3',
 	'4', '5', '6', '7',
 	'8', '9', 'a', 'b',
@@ -67,30 +67,30 @@ const char MD5::HEX[16] = {
 
 
 /* Default construct. */
-MD5::MD5() {
+CMD5::CMD5() {
 	reset();
 }
 
-/* Construct a MD5 object with a input buffer. */
-MD5::MD5(const void* input, size_t length) {
+/* Construct a CMD5 object with a input buffer. */
+CMD5::CMD5(const void* input, size_t length) {
 	reset();
-	update(input, length);
+	append(input, length);
 }
 
-/* Construct a MD5 object with a string. */
-MD5::MD5(const string& str) {
+/* Construct a CMD5 object with a string. */
+CMD5::CMD5(const string& str) {
 	reset();
-	update(str);
+	append(str);
 }
 
-/* Construct a MD5 object with a file. */
-MD5::MD5(ifstream& in) {
+/* Construct a CMD5 object with a file. */
+CMD5::CMD5(ifstream& in) {
 	reset();
-	update(in);
+	append(in);
 }
 
 /* Return the message-digest */
-const byte* MD5::digest() {
+const byte* CMD5::digest() {
 
 	if (!_finished) {
 		_finished = true;
@@ -100,7 +100,7 @@ const byte* MD5::digest() {
 }
 
 /* Reset the calculate state */
-void MD5::reset() {
+void CMD5::reset() {
 
 	_finished = false;
 	/* reset number of bits. */
@@ -113,17 +113,17 @@ void MD5::reset() {
 }
 
 /* Updating the context with a input buffer. */
-void MD5::update(const void* input, size_t length) {
-	update((const byte*)input, length);
+void CMD5::append(const void* input, size_t length) {
+	append((const byte*)input, length);
 }
 
 /* Updating the context with a string. */
-void MD5::update(const string& str) {
-	update((const byte*)str.c_str(), str.length());
+void CMD5::append(const string& str) {
+	append((const byte*)str.c_str(), str.length());
 }
 
 /* Updating the context with a file. */
-void MD5::update(ifstream& in) {
+void CMD5::append(ifstream& in) {
 
 	if (!in) {
 		return;
@@ -135,17 +135,17 @@ void MD5::update(ifstream& in) {
 		in.read(buffer, BUFFER_SIZE);
 		length = in.gcount();
 		if (length > 0) {
-			update(buffer, length);
+			append(buffer, length);
 		}
 	}
 	in.close();
 }
 
-/* MD5 block update operation. Continues an MD5 message-digest
+/* CMD5 block append operation. Continues an CMD5 message-digest
 operation, processing another message block, and updating the
 context.
 */
-void MD5::update(const byte* input, size_t length) {
+void CMD5::append(const byte* input, size_t length) {
 
 	uint32 i, index, partLen;
 
@@ -154,7 +154,7 @@ void MD5::update(const byte* input, size_t length) {
 	/* Compute number of bytes mod 64 */
 	index = (uint32)((_count[0] >> 3) & 0x3f);
 
-	/* update number of bits */
+	/* append number of bits */
 	if ((_count[0] += ((uint32)length << 3)) < ((uint32)length << 3)) {
 		++_count[1];
 	}
@@ -181,10 +181,10 @@ void MD5::update(const byte* input, size_t length) {
 	memcpy(&_buffer[index], &input[i], length - i);
 }
 
-/* MD5 finalization. Ends an MD5 message-_digest operation, writing the
+/* CMD5 finalization. Ends an CMD5 message-_digest operation, writing the
 the message _digest and zeroizing the context.
 */
-void MD5::final() {
+void CMD5::final() {
 
 	byte bits[8];
 	uint32 oldState[4];
@@ -201,10 +201,10 @@ void MD5::final() {
 	/* Pad out to 56 mod 64. */
 	index = (uint32)((_count[0] >> 3) & 0x3f);
 	padLen = (index < 56) ? (56 - index) : (120 - index);
-	update(PADDING, padLen);
+	append(PADDING, padLen);
 
 	/* Append length (before padding) */
-	update(bits, 8);
+	append(bits, 8);
 
 	/* Store state in digest */
 	encode(_state, _digest, 16);
@@ -214,8 +214,8 @@ void MD5::final() {
 	memcpy(_count, oldCount, 8);
 }
 
-/* MD5 basic transformation. Transforms _state based on block. */
-void MD5::transform(const byte block[64]) {
+/* CMD5 basic transformation. Transforms _state based on block. */
+void CMD5::transform(const byte block[64]) {
 
 	uint32 a = _state[0], b = _state[1], c = _state[2], d = _state[3], x[16];
 
@@ -302,7 +302,7 @@ void MD5::transform(const byte block[64]) {
 /* Encodes input (ulong) into output (byte). Assumes length is
 a multiple of 4.
 */
-void MD5::encode(const uint32* input, byte* output, size_t length) {
+void CMD5::encode(const uint32* input, byte* output, size_t length) {
 
 	for (size_t i = 0, j = 0; j < length; ++i, j += 4) {
 		output[j]= (byte)(input[i] & 0xff);
@@ -315,7 +315,7 @@ void MD5::encode(const uint32* input, byte* output, size_t length) {
 /* Decodes input (byte) into output (ulong). Assumes length is
 a multiple of 4.
 */
-void MD5::decode(const byte* input, uint32* output, size_t length) {
+void CMD5::decode(const byte* input, uint32* output, size_t length) {
 
 	for (size_t i = 0, j = 0; j < length; ++i, j += 4) {
 		output[i] = ((uint32)input[j]) | (((uint32)input[j + 1]) << 8) |
@@ -324,7 +324,7 @@ void MD5::decode(const byte* input, uint32* output, size_t length) {
 }
 
 /* Convert byte array to hex string. */
-string MD5::bytesToHexString(const byte* input, size_t length) {
+string CMD5::bytesToHexString(const byte* input, size_t length) {
 
 	string str;
 	str.reserve(length << 1);
@@ -339,6 +339,6 @@ string MD5::bytesToHexString(const byte* input, size_t length) {
 }
 
 /* Convert digest to string value */
-string MD5::toString() {
+string CMD5::toString() {
 	return bytesToHexString(digest(), 16);
 }

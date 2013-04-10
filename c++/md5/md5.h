@@ -1,5 +1,5 @@
-#ifndef MD5_H
-#define MD5_H
+#ifndef __MD5_H__
+#define __MD5_H__
 
 #include <string>
 #include <fstream>
@@ -11,22 +11,22 @@ typedef unsigned int uint32;
 using std::string;
 using std::ifstream;
 
-/* MD5 declaration. */
-class MD5 {
+/* CMD5 declaration. */
+class CMD5 {
 public:
-	MD5();
-	MD5(const void* input, size_t length);
-	MD5(const string& str);
-	MD5(ifstream& in);
-	void update(const void* input, size_t length);
-	void update(const string& str);
-	void update(ifstream& in);
+	CMD5();
+	CMD5(const void* input, size_t length);
+	CMD5(const string& str);
+	CMD5(ifstream& in);
+	void append(const void* input, size_t length);
+	void append(const string& str);
+	void append(ifstream& in);
 	const byte* digest();
 	string toString();
 	void reset();
 
 private:
-	void update(const byte* input, size_t length);
+	void append(const byte* input, size_t length);
 	void final();
 	void transform(const byte block[64]);
 	void encode(const uint32* input, byte* output, size_t length);
@@ -34,8 +34,8 @@ private:
 	string bytesToHexString(const byte* input, size_t length);
 
 	/* class uncopyable */
-	MD5(const MD5&);
-	MD5& operator=(const MD5&);
+	CMD5(const CMD5&);
+	CMD5& operator=(const CMD5&);
 
 private:
 	uint32 _state[4];	/* state (ABCD) */
@@ -49,4 +49,4 @@ private:
 	enum { BUFFER_SIZE = 1024 };
 };
 
-#endif /*MD5_H*/
+#endif /*__MD5_H__*/
