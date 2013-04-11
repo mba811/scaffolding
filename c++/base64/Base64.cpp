@@ -1,30 +1,7 @@
-/**********
-This library is free software; you can redistribute it and/or modify it under
-the terms of the GNU Lesser General Public License as published by the
-Free Software Foundation; either version 2.1 of the License, or (at your
-option) any later version. (See <http://www.gnu.org/copyleft/lesser.html>.)
-
-This library is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for
-more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this library; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-**********/
-// "liveMedia"
-// Copyright (c) 1996-2010 Live Networks, Inc.  All rights reserved.
-// Base64 encoding and decoding
-// implementation
-
 #include "base64.h"
 
-#include <string.h>
-
+static const char encode_map[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static char decode_map[256];
-
-
 static void initBase64DecodeMap()
 {
 	memset(decode_map,-1,sizeof(decode_map));
@@ -35,8 +12,6 @@ static void initBase64DecodeMap()
 	decode_map[(unsigned char)'/'] = 63;
 	decode_map[(unsigned char)'='] = 0;
 }
-
-static const char encode_map[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 bool CBase64::Encode(const string& strIn,string& strOut)
 {
@@ -74,7 +49,7 @@ bool CBase64::Encode(const string& strIn,string& strOut)
 
 	return true;
 }
-#include <iostream>
+
 bool CBase64::Decode(const string& strIn,string& strOut,bool fCheckInputValid/* = false*/)
 {
 	size_t nInlen = strIn.length();
