@@ -1,4 +1,4 @@
-#include "UrlEncode.h"
+#include "urlencode.h"
 
 static const char HEX2DEC[256] = 
 {
